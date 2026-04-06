@@ -25,6 +25,9 @@ def main():
     for tick in range(TOTAL_TICKS):
         if tick == FAULT_INJECTION_TICK:
             subsystems['power'].fault_active = True
+            subsystems['thermal'].fault_active = True
+            subsystems['comms'].fault_active = True
+            
             print(f'[T+{tick:02d}s] Injected fault: rapid battery drain')
 
         for name, subsystem in subsystems.items():
@@ -42,6 +45,13 @@ def main():
                         print(
                             f'[T+{tick:02d}s] ALERT: POWER_LOW_BUS - '
                             'voltage below 26.0V for 5 consecutive samples'
+                        )
+                        alerts_triggered[name] = True
+                elif len(histories[name]) >= 5 and detect_high_voltage(list(histories[name])):
+                    if not alerts_triggered[name]:
+                        print(
+                            f'[T+{tick:02d}s] ALERT: POWER_HIGH_BUS - '
+                            'voltage above 30.0V for 5 consecutive samples'
                         )
                         alerts_triggered[name] = True
             if name == 'thermal':
