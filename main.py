@@ -19,6 +19,13 @@ def main():
     ]
     power = PowerSubsystem()
     voltage_history: deque[float] = deque(maxlen=HISTORY_LENGTH)
+
+    thermal = ThermalSubsystem()
+    temperature_history: deque[float] = deque(maxlen=HISTORY_LENGTH)
+
+    comms = CommunicationSubsystem()
+    signal_history: deque[float] = deque(maxlen=HISTORY_LENGTH)
+    
     alerts_triggered = False
 
     print('Starting spacecraft FDIR power sim\n')
