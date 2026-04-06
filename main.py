@@ -2,7 +2,7 @@ from collections import deque
 from time import sleep
 
 from detectors import detect_low_voltage
-from subsystems import PowerSubsystem
+from subsystems import PowerSubsystem, ThermalSubsystem, CommunicationSubsystem
 
 
 HISTORY_LENGTH = 10
@@ -12,6 +12,11 @@ FAULT_INJECTION_TICK = 10
 
 
 def main():
+    subsystems = [
+        PowerSubsystem(),
+        ThermalSubsystem(),
+        CommunicationSubsystem()
+    ]
     power = PowerSubsystem()
     voltage_history: deque[float] = deque(maxlen=HISTORY_LENGTH)
     alerts_triggered = False
