@@ -1,6 +1,7 @@
 from collections import deque
-from time import sleep
 import random
+import time
+import streamlit as st
 import dashboard
 
 from detectors import detect_low_voltage, detect_high_voltage, detect_overtemperature, detect_undertemperature, detect_communication_loss
@@ -21,6 +22,8 @@ def main():
     }
     histories = {name: deque(maxlen=HISTORY_LENGTH) for name in subsystems}
 
+    placeholder = st.empty()
+
     for tick in range(TOTAL_TICKS):
         if tick == FAULT_INJECTION_TICK:
             subsystems['power'].fault_active = True
@@ -30,7 +33,7 @@ def main():
                 subsystems['thermal'].heater_on = True
             else:
                 subsystems['thermal'].cooler_on = True
-            
+
             subsystems['comms'].fault_active = True
 
         for name, subsystem in subsystems.items():
@@ -42,9 +45,10 @@ def main():
             if name == 'comms':
                 histories[name].append(subsystem.signal_strength)
 
-        dashboard.display(subsystems, histories)
+        with placeholder.container():
+            dashboard.display(subsystems, histories)
 
-        sleep(TICK_SECONDS)
+        time.sleep(TICK_SECONDS)
 
 if __name__ == '__main__':
     main()
