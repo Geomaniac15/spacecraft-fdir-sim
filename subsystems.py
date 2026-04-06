@@ -22,6 +22,7 @@ class PowerSubsystem(Subsystem):
         self.voltage = 28.0
 
     def update(self):
+        self.voltage = max(0.0, self.voltage)
         if self.fault_active:
             self.battery -= 2
             self.voltage -= 0.2
@@ -37,6 +38,7 @@ class ThermalSubsystem(Subsystem):
         self.cooler_on = False
     
     def update(self):
+        self.temperature = max(-10.0, min(self.temperature, 100.0))
         if self.fault_active and self.heater_on:
             self.temperature += 2.0
         elif self.heater_on:
@@ -54,6 +56,7 @@ class CommunicationSubsystem(Subsystem):
         self.missed_ticks = 0
     
     def update(self):
+        self.signal_strength = max(0.0, min(self.signal_strength, 100.0))
         if self.fault_active:
             self.heartbeat = False
             self.signal_strength -= 10.0
