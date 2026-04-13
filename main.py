@@ -44,19 +44,19 @@ def run_simulation(subsystems, histories, placeholder):
             alerts[name] = []
 
             if name == 'power':
-                if detect_low_voltage(value):
+                if detect_low_voltage(histories[name]):
                     alerts[name].append('LOW_VOLTAGE')
-                if detect_high_voltage(value):
+                if detect_high_voltage(histories[name]):
                     alerts[name].append('HIGH_VOLTAGE')
             
             elif name == 'thermal':
-                if detect_overtemperature(value):
+                if detect_overtemperature(histories[name]):
                     alerts[name].append('OVER_TEMP')
-                if detect_undertemperature(value):
+                if detect_undertemperature(histories[name]):
                     alerts[name].append('UNDER_TEMP')
             
             elif name == 'comms':
-                if detect_communication_loss(value):
+                if detect_communication_loss(histories[name]):
                     alerts[name].append('COMMS_LOSS')
 
         with placeholder.container():
