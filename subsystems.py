@@ -29,6 +29,9 @@ class PowerSubsystem(Subsystem):
         else:
             self.battery -= 0.2
             self.voltage -= 0.01
+    
+    def current_value(self):
+        return self.voltage
 
 class ThermalSubsystem(Subsystem):
     def __init__(self):
@@ -47,6 +50,9 @@ class ThermalSubsystem(Subsystem):
             self.temperature -= 2.0
         elif self.cooler_on:
             self.temperature -= 0.5
+    
+    def current_value(self):
+        return self.temperature
 
 class CommunicationSubsystem(Subsystem):
     def __init__(self):
@@ -64,4 +70,7 @@ class CommunicationSubsystem(Subsystem):
         else:
             self.heartbeat = True
             self.signal_strength = max(0.0, self.signal_strength - 1.0)
+    
+    def current_value(self):
+        return self.signal_strength
         

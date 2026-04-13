@@ -34,9 +34,30 @@ def run_simulation(subsystems, histories, placeholder):
     for tick in range(TOTAL_TICKS):
         inject_faults(tick, subsystems)
 
+        alerts = {}
+
         for name, subsystem in subsystems.items():
             subsystem.update()
-            histories[name].append(subsystem.current_value())
+            value = subsystem.current_value()
+            histories[name].append(value)
+
+            alerts[name] = []
+
+            if name == 'power':
+                if detect_low_voltage(value):
+                    alerts[name].append('LOW_VOLTAGE')
+                if detect_high_voltage(value):
+                    alerts[name].append('HIGH_VOLTAGE')
+            
+            elif name == 'thermal':
+                if detect_overtemperature(value):
+                    alerts[name].append('OVER_TEMP')
+                if detect_undertemperature(value):
+                    alerts[name].append('UNDER_TEMP')
+            
+            elif name == 'comms':
+                if detect_communication_loss(value):
+                    alerts[name].append('COMMS_LOSS')
 
         with placeholder.container():
             dashboard.display(subsystems, histories)
