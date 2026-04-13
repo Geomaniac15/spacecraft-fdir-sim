@@ -14,6 +14,36 @@ TOTAL_TICKS = 30
 FAULT_INJECTION_TICK = 10
 
 
+def inject_faults(tick, subsystems):
+    if tick >= FAULT_INJECTION_TICK:
+        if random.random() < 0.3:  # 30% chance power fails
+            subsystems['power'].fault_active = True
+
+        if random.random() < 0.2:  # 20% chance thermal fails
+            subsystems['thermal'].fault_active = True
+            if random.random() < 0.5:
+                subsystems['thermal'].heater_on = True
+            else:
+                subsystems['thermal'].cooler_on = True
+
+        if random.random() < 0.1:  # 10% chance comms fails
+            subsystems['comms'].fault_active = True
+
+
+def run_simulation(subsystems, histories, placeholder):
+    for tick in range(TOTAL_TICKS):
+        inject_faults(tick, subsystems)
+
+        for name, subsystem in subsystems.items():
+            subsystem.update()
+            histories[name].append(subsystem.current_value())
+
+        with placeholder.container():
+            dashboard.display(subsystems, histories)
+
+        time.sleep(TICK_SECONDS)
+
+
 def main():
     subsystems = {
         'power': PowerSubsystem(),
@@ -21,34 +51,10 @@ def main():
         'comms': CommunicationSubsystem()
     }
     histories = {name: deque(maxlen=HISTORY_LENGTH) for name in subsystems}
-
     placeholder = st.empty()
 
-    for tick in range(TOTAL_TICKS):
-        if tick == FAULT_INJECTION_TICK:
-            subsystems['power'].fault_active = True
+    run_simulation(subsystems, histories, placeholder)
 
-            subsystems['thermal'].fault_active = True
-            if random.random() < 0.5:
-                subsystems['thermal'].heater_on = True
-            else:
-                subsystems['thermal'].cooler_on = True
-
-            subsystems['comms'].fault_active = True
-
-        for name, subsystem in subsystems.items():
-            subsystem.update()
-            if name == 'power':
-                histories[name].append(subsystem.voltage)
-            if name == 'thermal':
-                histories[name].append(subsystem.temperature)
-            if name == 'comms':
-                histories[name].append(subsystem.signal_strength)
-
-        with placeholder.container():
-            dashboard.display(subsystems, histories)
-
-        time.sleep(TICK_SECONDS)
 
 if __name__ == '__main__':
     main()
